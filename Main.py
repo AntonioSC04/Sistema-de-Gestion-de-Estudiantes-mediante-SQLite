@@ -128,8 +128,8 @@ class Search_Dialog(QDialog):
             main_window.table.item(item.row(),
                                    1).setSelected(True)
 
-            cursor.close()
-            connection.close()
+        cursor.close()
+        connection.close()
 
 app = QApplication(sys.argv)
 main_window = MainWindow()
