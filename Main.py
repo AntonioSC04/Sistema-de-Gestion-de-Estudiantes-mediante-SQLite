@@ -108,7 +108,7 @@ class Search_Dialog(QDialog):
         self.student_name.setPlaceholderText("Nombre")
         layout.addWidget(self.student_name)
 
-        button = QPushButton("Agregar")
+        button = QPushButton("Buscar")
         button.clicked.connect(self.search)
         layout.addWidget(button)
 
