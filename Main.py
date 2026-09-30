@@ -1,7 +1,8 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QTableWidget, QTableWidgetItem, QGridLayout, \
-    QAbstractItemView, QDialog, QLineEdit, QVBoxLayout, QComboBox, QPushButton, QToolBar, QStatusBar
+    QAbstractItemView, QDialog, QLineEdit, QVBoxLayout, QComboBox, QPushButton, QToolBar, QStatusBar, QLabel, \
+    QMessageBox
 import sys
 import sqlite3
 
@@ -108,7 +109,7 @@ class EditDialog(QDialog):
 
         course_name = main_window.table.item(index, 2).text()
         self.course_name = QComboBox()
-        courses = ['Biology', 'Mathematics', 'Psychology', 'Physics', 'Philosophy']
+        courses = ['Biology', 'Math', 'Astronomy', 'Psychology', 'Physics', 'Philosophy']
         self.course_name.addItems(courses)
         self.course_name.setCurrentText(course_name)
         layout.addWidget(self.course_name)
@@ -139,7 +140,41 @@ class EditDialog(QDialog):
         main_window.load_data()
 
 class DeleteDialog(QDialog):
-    pass
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Eliminar Datos del Estudiante")
+
+        layout = QGridLayout()
+        confirmation = QLabel("Estas seguro de Eliminar estos datos?")
+        yes = QPushButton("Si")
+        no = QPushButton("No")
+
+        layout.addWidget(confirmation, 0, 0, 1, 2)
+        layout.addWidget(yes, 1, 0)
+        layout.addWidget(no, 1, 1)
+        self.setLayout(layout)
+
+        yes.clicked.connect(self.delete_student)
+
+    def delete_student(self):
+
+        index = main_window.table.currentRow()
+        student_id = main_window.table.item(index, 0).text()
+
+        connection = sqlite3.connect("database.db")
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM students WHERE id = ?", (student_id, ))
+        connection.commit()
+        cursor.close()
+        connection.close()
+        main_window.load_data()
+
+        self.close()
+
+        confirmation_widget = QMessageBox()
+        confirmation_widget.setWindowTitle("Proceso Concluido")
+        confirmation_widget.setText("Los datos se han eliminado exitosamente")
+        confirmation_widget.exec()
 
 class InsertDialog(QDialog):
     def __init__(self):
@@ -155,7 +190,7 @@ class InsertDialog(QDialog):
         layout.addWidget(self.student_name)
 
         self.course_name = QComboBox()
-        courses = ['Biology', 'Mathematics', 'Psychology', 'Physics', 'Philosophy']
+        courses = ['Biology', 'Math', 'Astronomy', 'Psychology', 'Physics', 'Philosophy']
         self.course_name.addItems(courses)
         layout.addWidget(self.course_name)
 
@@ -163,7 +198,7 @@ class InsertDialog(QDialog):
         self.mobile.setPlaceholderText("Numero")
         layout.addWidget(self.mobile)
 
-        button = QPushButton("Buscar")
+        button = QPushButton("Agregar")
         button.clicked.connect(self.add_student)
         layout.addWidget(button)
 
